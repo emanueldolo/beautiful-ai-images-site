@@ -1,15 +1,17 @@
 const accessKey = 'yp065C2Lk8RAhyryHw7zplEV-4SsBM-SHrhrtx3f4Vo';  // Replace with your actual Unsplash Access Key
+const query = 'parkour';  // Replace with your desired category or keyword
 
 async function fetchImages() {
     try {
-        const response = await fetch(`https://api.unsplash.com/photos/?client_id=${accessKey}&per_page=6`);
+        const response = await fetch(`https://api.unsplash.com/search/photos?client_id=${accessKey}&query=${query}&per_page=6`);
         if (!response.ok) {
             throw new Error('Failed to fetch images');
         }
-        const images = await response.json();
+        const data = await response.json();
+        const images = data.results;  // Use 'results' from the search response
 
         const gallery = document.getElementById('image-gallery');
-        gallery.innerHTML = '';  // Clear any existing content
+        gallery.innerHTML = '';
 
         images.forEach(image => {
             const imageCard = document.createElement('div');
@@ -31,5 +33,5 @@ async function fetchImages() {
     }
 }
 
-// Call the function to load images when the page loads
 fetchImages();
+
