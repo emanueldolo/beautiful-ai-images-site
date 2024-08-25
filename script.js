@@ -1,6 +1,7 @@
-const accessKey = 'Yyp065C2Lk8RAhyryHw7zplEV-4SsBM-SHrhrtx3f4Vo';  // Replace with your actual Unsplash Access Key
+const accessKey = 'yp065C2Lk8RAhyryHw7zplEV-4SsBM-SHrhrtx3f4Vo';  // Replace with your Unsplash Access Key
 const query = 'parkour';  // Replace with your desired category or keyword
-const count = 10;  // Number of random images to fetch each time
+const perPage = 10;  // Number of images per request
+let page = 1;  // Current page number
 let isLoading = false;  // To prevent multiple requests at once
 
 async function fetchImages() {
@@ -8,16 +9,14 @@ async function fetchImages() {
     isLoading = true;
 
     try {
-        const response = await fetch(`https://api.unsplash.com/photos/random?client_id=${accessKey}&query=${query}&count=${count}`);
+        const response = await fetch(`https://api.unsplash.com/search/photos?client_id=${accessKey}&query=${query}&per_page=${perPage}&page=${page}`);
         if (!response.ok) {
             throw new Error('Failed to fetch images');
         }
-        const images = await response.json();
-        console.log('Fetched random images:', images);  // Log the data to verify structure
+        const data = await response.json();
+        const images = data.results;
 
         const gallery = document.getElementById('image-gallery');
-        gallery.innerHTML = '';  // Clear the gallery to avoid duplicates
-
         images.forEach(image => {
             const imageCard = document.createElement('div');
             imageCard.className = 'image-card';
@@ -29,14 +28,25 @@ async function fetchImages() {
             `;
             gallery.appendChild(imageCard);
         });
+
+        // Update page number for the next fetch
+        page += 1;
     } catch (error) {
         console.error('Error fetching images:', error);
-        const gallery = document.getElementById('image-gallery');
-        gallery.innerHTML = '<p>Sorry, we couldn’t load the images. Please try again later.</p>';
     } finally {
         isLoading = false;
     }
 }
 
-// Initial fetch to load random images when the page loads
+function handleScroll() {
+    const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
+    if (nearBottom && !isLoading) {
+        fetchImages();
+    }
+}
+
+// Initial fetch to load images when the page loads
 fetchImages();
+
+// Add scroll event listener
+window.addEventListener('scroll', handleScroll);
