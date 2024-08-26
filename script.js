@@ -1,7 +1,6 @@
 const accessKey = 'yp065C2Lk8RAhyryHw7zplEV-4SsBM-SHrhrtx3f4Vo';  // Replace with your Unsplash Access Key
 const query = 'parkour';  // Replace with your desired category or keyword
-const perPage = 10;  // Number of images per request
-let page = 1;  // Current page number
+const count = 10;  // Number of random images to fetch per request
 let isLoading = false;  // To prevent multiple requests at once
 
 async function fetchImages() {
@@ -9,12 +8,11 @@ async function fetchImages() {
     isLoading = true;
 
     try {
-        const response = await fetch(`https://api.unsplash.com/search/photos?client_id=${accessKey}&query=${query}&per_page=${perPage}&page=${page}`);
+        const response = await fetch(`https://api.unsplash.com/photos/random?client_id=${accessKey}&count=${count}&query=${query}`);
         if (!response.ok) {
             throw new Error(`Failed to fetch images: ${response.statusText}`);
         }
-        const data = await response.json();
-        const images = data.results;
+        const images = await response.json();
 
         const gallery = document.getElementById('image-gallery');
 
@@ -40,7 +38,6 @@ async function fetchImages() {
             });
         });
 
-        page += 1;
     } catch (error) {
         console.error('Error fetching images:', error);
         const gallery = document.getElementById('image-gallery');
@@ -53,7 +50,7 @@ async function fetchImages() {
 function handleScroll() {
     const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
     if (nearBottom && !isLoading) {
-        fetchImages();
+        fetchImages();  // Fetch more images when near the bottom of the page
     }
 }
 
